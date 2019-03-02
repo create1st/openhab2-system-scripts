@@ -1,0 +1,17 @@
+#/bin/bash
+echo "Encoding \"$1\" to $2"
+XIAOMI_GATEWAY="192.168.8.122"
+INPUT_TEXT=$1
+TEXT=`echo "$INPUT_TEXT" | curl -Gso /dev/null -w %{url_effective} --data-urlencode @- "" | cut -c 3-`
+SOUND_ID=$2
+AUDIO_FILE="audio.aac"
+AUDIO_FILE_PATH="/etc/openhab2/html/$AUDIO_FILE"
+TOKEN=$3
+MY_IP=`ifconfig | grep 192 | awk '{ print $2 }'`
+ffmpeg -y -i "https://translate.google.com/translate_tts?ie=UTF-8&tl=pl&client=tw-ob&q=$TEXT" -b:a 64k $AUDIO_FILE_PATH
+#miio discover
+#miio inspect $XIAOMI_GATEWAY
+#miio discover --sync 
+#miio tokens update $XIAOMI_GATEWAY" --token $TOKEN
+miio protocol call $XIAOMI_GATEWAY download_user_music [\"$SOUND_ID\",\"http://$MY_IP:8080/static/$AUDIO_FILE\"]
+miio protocol call $XIAOMI_GATEWAY play_music_new [\"$SOUND_ID\",15]

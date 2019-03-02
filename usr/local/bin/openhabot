@@ -1,0 +1,3 @@
+#!/bin/sh
+cd /usr/share/openhabot
+/usr/bin/node .

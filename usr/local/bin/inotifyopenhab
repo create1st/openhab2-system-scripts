@@ -1,0 +1,6 @@
+#!/bin/sh
+inotifywait -mrs --timefmt '%d/%m/%y %H:%M' --format '%T %w %f' -e close_write /media/storage/xiaomi_camera_videos | while read date time dir file; do
+	FILECHANGE=${dir}${file}
+	curl -v -H "Content-Type: text/plain"  -X POST -d "$FILECHANGE" http://onepi:8080/rest/items/incron_monitor_xiaomi_camera
+	echo "OpenHAB notification send @ ${date}T${time}"
+done
