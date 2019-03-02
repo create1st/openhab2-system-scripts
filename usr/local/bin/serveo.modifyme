@@ -1,0 +1,2 @@
+#!/bin/sh
+/usr/bin/autossh -M 0 -i /root/.ssh/id_rsa -R %1:80:localhost:1337 serveo.net
