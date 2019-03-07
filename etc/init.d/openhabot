@@ -7,32 +7,35 @@
 # Required-Stop:     
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: serveo server
+# Short-Description: OpenHaBot server
 # Description:       Start / Stop serveo server
 ### END INIT INFO
 
-DAEMON=nohup /usr/local/bin/openhabot < /dev/null &
-NAME=serveo
+DAEMON=/usr/bin/node
+NAME=openhabot
+DAEMON_OPTS=/usr/share/openhabot/index.js
+PID=/var/run/openhabot.pid
 
 test -x $DAEMON || exit 0
 
 case "$1" in
     start)
-    echo -n "Starting OpenHaBot: "  $DAEMON
-    start-stop-daemon --start --exec $DAEMON
-    echo "serveo."
+    echo -n "Starting " $NAME ": "
+    start-stop-daemon --background --pidfile $PID --make-pidfile --start --exec $DAEMON $DAEMON_OPTS
+    echo $NAME "."
     ;;
+
     stop)
-    echo -n "Shutting OpenHaBot:"
-    start-stop-daemon --stop --oknodo --retry 30 --exec $DAEMON
-    echo "serveo."
+    echo -n "Shutting " $NAME ": "
+    start-stop-daemon --stop --oknodo --retry 30 --remove-pidfile --pidfile $PID
+    echo $NAME "."
     ;;
 
     restart)
-    echo -n "Restarting OpenHaBot: "
-    start-stop-daemon --stop --oknodo --retry 30 --exec $DAEMON
-    start-stop-daemon --start --exec $DAEMON
-    echo "serveo."
+    echo -n "Restarting " $NAME ": "
+    start-stop-daemon --stop --oknodo --retry 30 --remove-pidfile --pidfile $PID
+    start-stop-daemon --background --pidfile $PID --make-pidfile --start --exec $DAEMON $DAEMON_OPTS
+    echo $NAME "."
     ;;
 
     *)

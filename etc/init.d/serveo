@@ -11,28 +11,31 @@
 # Description:       Start / Stop serveo server
 ### END INIT INFO
 
-DAEMON=nohup /usr/local/bin/serveo < /dev/null &
+DAEMON=/usr/lib/autossh/autossh
 NAME=serveo
+DAEMON_OPTS="-M 0 -i /root/.ssh/id_rsa -R webhook-oh2.craftandtechnology.com:80:localhost:1337 serveo.net"
+PID=/var/run/serveo.pid
 
 test -x $DAEMON || exit 0
 
 case "$1" in
     start)
-    echo -n "Starting webhook tunnel: "  $DAEMON
-    start-stop-daemon --start --exec $DAEMON
-    echo "serveo."
+    echo -n "Starting " $NAME ": "
+    start-stop-daemon --background --pidfile $PID --make-pidfile --start --exec $DAEMON -- $DAEMON_OPTS
+    echo $NAME "."
     ;;
+
     stop)
-    echo -n "Shutting webhook tunnel:"
-    start-stop-daemon --stop --oknodo --retry 30 --exec $DAEMON
-    echo "serveo."
+    echo -n "Shutting " $NAME ": "
+    start-stop-daemon --stop --oknodo --retry 30 --remove-pidfile --pidfile $PID
+    echo $NAME "."
     ;;
 
     restart)
-    echo -n "Restarting webhook tunnel: "
-    start-stop-daemon --stop --oknodo --retry 30 --exec $DAEMON
-    start-stop-daemon --start --exec $DAEMON
-    echo "serveo."
+    echo -n "Restarting " $NAME ": "
+    start-stop-daemon --stop --oknodo --retry 30 --remove-pidfile --pidfile $PID
+    start-stop-daemon --background --pidfile $PID --make-pidfile --start --exec $DAEMON -- $DAEMON_OPTS
+    echo $NAME "."
     ;;
 
     *)

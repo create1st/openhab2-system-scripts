@@ -11,28 +11,31 @@
 # Description:       Start / Stop inotifyopenhab server
 ### END INIT INFO
 
-DAEMON=nohup /usr/local/bin/inotifyopenhab < /dev/null &
+DAEMON=/usr/local/bin/inotifyopenhab
 NAME=inotifyopenhabd
+PID=/var/run/inotifyopehab.pid
+PPID=`cat $PID`
 
 test -x $DAEMON || exit 0
 
 case "$1" in
     start)
-    echo -n "Starting inotifyopenhabd: "
-    start-stop-daemon --start --exec $DAEMON
-    echo "inotifyopenhabd."
+    echo -n "Starting " $NAME ": "
+    start-stop-daemon --background --pidfile $PID --make-pidfile --start --exec $DAEMON
+    echo $NAME "."
     ;;
+
     stop)
-    echo -n "Shutting down inotifyopenhabd:"
-    start-stop-daemon --stop --oknodo --retry 30 --exec $DAEMON
-    echo "inotifyopenhabd."
+    echo -n "Shutting " $NAME ": "
+    start-stop-daemon --stop --oknodo --retry 30 --ppid $PPID
+    echo $NAME "."
     ;;
 
     restart)
-    echo -n "Restarting inotifyopenhabd: "
-    start-stop-daemon --stop --oknodo --retry 30 --exec $DAEMON
-    start-stop-daemon --start --exec $DAEMON
-    echo "inotifyopehabd."
+    echo -n "Restarting " $NAME ": "
+    start-stop-daemon --stop --oknodo --retry 30 --ppid $PPID
+    start-stop-daemon --background --pidfile $PID --make-pidfile --start --exec $DAEMON
+    echo $NAME "."
     ;;
 
     *)
