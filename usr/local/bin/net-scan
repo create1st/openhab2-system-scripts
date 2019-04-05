@@ -1,0 +1,2 @@
+#!/bin/bash
+for output in `arp-scan -l | grep 192 | awk '{print $1}'`; do avahi-resolve-address $output; done;
